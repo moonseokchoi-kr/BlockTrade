@@ -26,10 +26,41 @@ class _BlockTradeHomeState extends State<BlockTradeHome> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Block Trade'),
+        centerTitle: true,
+        elevation: 0.0,
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.shopping_cart),
+            onPressed: () {
+              print('cart button is clicked');
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () {
+              print('search button is clicked');
+            },
+          )
+        ],
+        //위젯 왼쪽에 위치하도록 만듬
       ),
-      body: Center(
-        child: Column(
-          children: <Widget>[Text('Click the Button'), Text('0')],
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            UserAccountsDrawerHeader(
+              accountName: Text('test'),
+              accountEmail: Text('mmonseok@gmail.com'),
+              onDetailsPressed: () {
+                print('arrow is clicked');
+              },
+              decoration: BoxDecoration(
+                  color: Colors.blue[200],
+                  borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(40.0),
+                      bottomRight: Radius.circular(40.0))),
+            )
+          ],
         ),
       ),
     );
