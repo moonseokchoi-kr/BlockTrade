@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'songs_tab.dart';
 
 void main() => runApp(BlockTradeApp());
 
@@ -8,60 +9,59 @@ class BlockTradeApp extends StatelessWidget {
     return MaterialApp(
       title: 'BlockTrade',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.deepOrange,
       ),
-      home: BlockTradeHome(),
+      home: UsedTradingHomePage(),
     );
   }
 }
 
-class BlockTradeHome extends StatefulWidget {
+class UsedTradingHomePage extends StatefulWidget {
   @override
-  _BlockTradeHomeState createState() => _BlockTradeHomeState();
+  _UsedTradingHomePageState createState() => _UsedTradingHomePageState();
 }
 
-class _BlockTradeHomeState extends State<BlockTradeHome> {
+class _UsedTradingHomePageState extends State<UsedTradingHomePage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Block Trade'),
-        centerTitle: true,
-        elevation: 0.0,
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.shopping_cart),
-            onPressed: () {
-              print('cart button is clicked');
+    return SongsTab(
+      androidDrawer: _AndroidDrawer(),
+    );
+  }
+}
+
+class _AndroidDrawer extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          DrawerHeader(
+            decoration: BoxDecoration(color: Colors.green),
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Icon(
+                Icons.account_circle,
+                color: Colors.green.shade800,
+                size: 96,
+              ),
+            ),
+          ),
+          ListTile(
+            leading: SongsTab.androidIcon,
+            title: Text(SongsTab.title),
+            onTap: () {
+              Navigator.pop(context);
             },
           ),
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {
-              print('search button is clicked');
-            },
-          )
+
+          // Long drawer contents are often segmented.
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Divider(),
+          ),
         ],
-        //위젯 왼쪽에 위치하도록 만듬
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            UserAccountsDrawerHeader(
-              accountName: Text('test'),
-              accountEmail: Text('mmonseok@gmail.com'),
-              onDetailsPressed: () {
-                print('arrow is clicked');
-              },
-              decoration: BoxDecoration(
-                  color: Colors.blue[200],
-                  borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(40.0),
-                      bottomRight: Radius.circular(40.0))),
-            )
-          ],
-        ),
       ),
     );
   }
