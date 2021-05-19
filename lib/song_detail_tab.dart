@@ -4,7 +4,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_layouts/flutter_layouts.dart';
 import 'widgets.dart';
 
 /// Page shown when a card in the songs tab is tapped.
@@ -22,61 +22,134 @@ class SongDetailTab extends StatelessWidget {
   final String title;
   final Image image;
 
-  Widget _buildBody() {
+  Widget _buildBody(BuildContext ctx) {
     return SafeArea(
       bottom: false,
       left: false,
       right: false,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Hero(
-            tag: id,
-            child: HeroAnimatingSongCard(
-              title: title,
-              image: image,
-              heroAnimation: AlwaysStoppedAnimation(1),
-            ),
-            // This app uses a flightShuttleBuilder to specify the exact widget
-            // to build while the hero transition is mid-flight.
-            //
-            // It could either be specified here or in SongsTab.
-            flightShuttleBuilder: (context, animation, flightDirection,
-                fromHeroContext, toHeroContext) {
-              return HeroAnimatingSongCard(
+      child: Footer(
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Hero(
+              tag: id,
+              child: HeroAnimatingSongCard(
                 title: title,
                 image: image,
-                heroAnimation: animation,
-              );
-            },
-          ),
-          Divider(
-            height: 0,
-            color: Colors.grey,
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: 10,
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return Padding(
-                    padding:
-                        const EdgeInsets.only(left: 15, top: 16, bottom: 8),
-                    child: Text(
-                      'You might also like:',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  );
-                }
-                // Just a bunch of boxes that simulates loading song choices.
-                return SongPlaceholderTile();
+                heroAnimation: AlwaysStoppedAnimation(1),
+              ),
+              // This app uses a flightShuttleBuilder to specify the exact widget
+              // to build while the hero transition is mid-flight.
+              //
+              // It could either be specified here or in SongsTab.
+              flightShuttleBuilder: (context, animation, flightDirection,
+                  fromHeroContext, toHeroContext) {
+                return HeroAnimatingSongCard(
+                  title: title,
+                  image: image,
+                  heroAnimation: animation,
+                );
               },
             ),
+            Divider(
+              height: 0,
+              color: Colors.grey,
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: 10,
+                itemBuilder: (context, index) {
+                  if (index == 0) {
+                    return Padding(
+                      padding: const EdgeInsets.only(
+                          left: 15, top: 16, right: 16, bottom: 8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: TextStyle(
+                                fontSize: 40, fontWeight: FontWeight.bold),
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                child: Text(
+                                  'category',
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                                margin: EdgeInsets.only(
+                                  right: 8,
+                                  bottom: 10,
+                                ),
+                              ),
+                              Container(
+                                child: Text(
+                                  'time',
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                                margin: EdgeInsets.only(
+                                  right: 8,
+                                  bottom: 10,
+                                ),
+                              )
+                            ],
+                          ),
+                          Divider(
+                            height: 0,
+                            color: Colors.grey,
+                          ),
+                          Container(
+                            child: Text(
+                              '5번정도 신고 보관만 해온 제품입니다~\n유행타지 않는 기본 디자인에말린장미 색상이라 여기저기 잘 어울려요.\n37.5인데 조금 작게 나와서 240정도 되는것같습니다.\n밑창은 제가 따로 안하고 신어서\n수선집가서 하시면 새것처럼 신으실수있을것 같아요^^',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.normal),
+                            ),
+                            margin: EdgeInsets.only(top: 10, bottom: 10),
+                          ),
+                          Divider(
+                            height: 0,
+                            color: Colors.grey,
+                          ),
+                          Container(
+                            child: Text(
+                              '추천 상품',
+                              style: TextStyle(
+                                  fontSize: 30, fontWeight: FontWeight.bold),
+                            ),
+                            margin: EdgeInsets.only(top: 10, bottom: 10),
+                          )
+                        ],
+                      ),
+                    );
+                  }
+
+                  // Just a bunch of boxes that simulates loading song choices.
+                  return SongPlaceholderTile();
+                },
+              ),
+            ),
+          ],
+        ),
+        footer: Container(
+          decoration: BoxDecoration(color: Colors.white),
+          child: Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.favorite_outline),
+                onPressed: () {},
+              ),
+              Text('10,000원'),
+              TextButton(onPressed: () {}, child: Text('거래하기'))
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -88,7 +161,7 @@ class SongDetailTab extends StatelessWidget {
   Widget _buildAndroid(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(title)),
-      body: _buildBody(),
+      body: _buildBody(context),
     );
   }
 
