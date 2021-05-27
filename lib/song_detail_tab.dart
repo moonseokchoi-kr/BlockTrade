@@ -66,6 +66,43 @@ class SongDetailTab extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          //사용자 정보 표시 하는 곳 닉네임과 신뢰토큰을 표시
+                          Row(
+                            children: [
+                              Text("userNickname",
+                                textAlign: TextAlign.right,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(left: 180),
+                                child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children:[
+                                      Text("100",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text("신뢰토큰",
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                    ]
+                                ),
+                              ),
+                            ],
+                          ),
+                          Divider(
+                            height: 0,
+                            color: Colors.grey.shade300,
+                          ),
                           Text(
                             title,
                             style: TextStyle(
@@ -75,35 +112,18 @@ class SongDetailTab extends StatelessWidget {
                             children: [
                               Container(
                                 child: Text(
-                                  'category',
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey,
-                                      fontWeight: FontWeight.w500),
-                                ),
-                                margin: EdgeInsets.only(
-                                  right: 8,
-                                  bottom: 10,
-                                ),
-                              ),
-                              Container(
-                                child: Text(
                                   'time',
                                   style: TextStyle(
                                       fontSize: 12,
                                       color: Colors.grey,
                                       fontWeight: FontWeight.w500),
                                 ),
-                                margin: EdgeInsets.only(
-                                  right: 8,
-                                  bottom: 10,
-                                ),
                               )
                             ],
                           ),
                           Divider(
                             height: 0,
-                            color: Colors.grey,
+                            color: Colors.white,
                           ),
                           Container(
                             child: Text(

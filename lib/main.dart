@@ -1,5 +1,8 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'songs_tab.dart';
+import 'login.dart';
 
 void main() => runApp(BlockTradeApp());
 
@@ -11,10 +14,33 @@ class BlockTradeApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.deepOrange,
       ),
-      home: UsedTradingHomePage(),
+      home: LoginHomePage(),
     );
   }
 }
+
+class LoginHomePage extends StatelessWidget {
+  const LoginHomePage({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+        future: Firebase.initializeApp(),
+        builder: (context,snapshot){
+          if(snapshot.hasError){
+            return Center(
+              child: Text("firebase load fail"),
+            );
+          }
+          if(snapshot.connectionState == ConnectionState.done){
+            return UsedTradingHomePage();
+          }
+          return CircularProgressIndicator();
+        }
+    );
+  }
+}
+
 
 class UsedTradingHomePage extends StatefulWidget {
   @override
@@ -24,8 +50,19 @@ class UsedTradingHomePage extends StatefulWidget {
 class _UsedTradingHomePageState extends State<UsedTradingHomePage> {
   @override
   Widget build(BuildContext context) {
-    return SongsTab(
-      androidDrawer: _AndroidDrawer(),
+    return Scaffold(
+      body: StreamBuilder(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (BuildContext context, AsyncSnapshot<User> snapshot){
+          if(snapshot.data == null){
+            return LoginWidget();
+          }else{
+            return SongsTab(
+              androidDrawer: _AndroidDrawer(),
+            );
+          }
+        },
+      ),
     );
   }
 }
