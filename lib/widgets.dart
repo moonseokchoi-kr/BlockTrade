@@ -5,6 +5,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'dart:io';
+import 'posts.dart';
+import 'postsService.dart';
 
 /// A simple widget that builds different things on different platforms.
 class PlatformWidget extends StatelessWidget {
@@ -136,10 +141,12 @@ class HeroAnimatingSongCard extends StatelessWidget {
     @required this.title,
     @required this.image,
     @required this.heroAnimation,
+    @required this.price,
     this.onPressed,
   });
 
   final String title;
+  final int price;
   final Image image;
   final Animation<double> heroAnimation;
   final VoidCallback onPressed;
@@ -174,13 +181,31 @@ class HeroAnimatingSongCard extends StatelessWidget {
                     color: Colors.black12,
                     alignment: Alignment.centerLeft,
                     padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: Text(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
                       title,
                       style: TextStyle(
                         fontSize: 21,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
+                        ),
+                        Container(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            "${price.toString()} KLAY",
+                            style: TextStyle(
+                              fontSize: 21,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                    ],
+                    )
                   ),
                 ),
               ],
@@ -333,3 +358,138 @@ void showChoices(BuildContext context, List<String> choices) {
       assert(false, 'Unexpected platform $defaultTargetPlatform');
   }
 }
+
+class WritePosts extends StatefulWidget {
+  final String author;
+  const WritePosts({Key key, this.author}) : super(key: key);
+
+  @override
+  _WritePostsState createState() => _WritePostsState();
+}
+
+class _WritePostsState extends State<WritePosts> {
+
+  String productName;
+  String content;
+  int price;
+  File _image;
+  PostsService _postsService;
+  String _downloadURL;
+  @override
+  Widget build(BuildContext context) {
+    _postsService = PostsService();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Write Post"),
+        leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: (){
+          Navigator.pop(context);
+        }),
+        actions: [
+          IconButton(
+            onPressed: (){
+              Posts p = new Posts(productName: productName, author: widget.author, price: price, content: content, picture: _downloadURL);
+              _postsService.putPost(p);
+              Navigator.pop(context);
+            },
+            icon:Icon(Icons.save),
+            tooltip: "save the post",),
+        ],
+      ),
+      body: Column(
+        children: [
+          TextField(
+            decoration: kTextFieldDecoration.copyWith(hintText: "productName"),
+            onChanged: (value){productName = value;},
+          ),
+          CircleAvatar(
+            backgroundImage: (_image != null) ? FileImage(_image):NetworkImage("https://firebasestorage.googleapis.com/v0/b/usedtrading.appspot.com/o/posts%2F1.jpg?alt=media"),
+            radius: 30,
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              RaisedButton(
+                child: Text("Gallery"),
+                onPressed: () {
+                  _uploadImageToStorage(ImageSource.gallery);
+                },
+              ),
+              RaisedButton(
+                child: Text("Camera"),
+                onPressed: () {
+                  _uploadImageToStorage(ImageSource.camera);
+                },
+              ),
+            ],
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          TextField(
+            decoration: kTextFieldDecoration.copyWith(hintText: "price"),
+            onChanged: (value){price = int.parse(value);},
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Container(
+            height: 200,
+            padding: EdgeInsets.all(10.0),
+            child: new ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: 200.0,
+              ),
+              child: new Scrollbar(
+                child: new SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  reverse: true,
+                  child: SizedBox(
+                    height: 190.0,
+                    child: new TextField(
+                      maxLines: 100,
+                      decoration: kTextFieldDecoration.copyWith(hintText: "content"),
+                      onChanged: (value){content = value;},
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  void _uploadImageToStorage(ImageSource source) async {
+    final picker =  ImagePicker();
+    final image = await picker.getImage(source: source);
+
+    if (image == null) return;
+    setState(() {
+      _image = File(image.path);
+    });
+    firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
+        .ref()
+        .child('posts')
+        .child("${_postsService.getCurrentID()}.jpg");
+
+    firebase_storage.UploadTask uploadTask = ref.putFile(_image);
+    Pattern linkPattern = '^.*.media';
+    RegExp linkReg = RegExp(linkPattern);
+    await uploadTask.whenComplete(() => ref.getDownloadURL().then((value) =>
+    _downloadURL =linkReg.stringMatch(value)));
+
+    print(_downloadURL);
+  }
+}
+const kTextFieldDecoration = InputDecoration(
+  filled: true,
+  fillColor: Colors.white,
+  hintStyle: TextStyle(color: Colors.grey),
+  border: OutlineInputBorder(
+    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+    borderSide: BorderSide.none,
+  ),
+);

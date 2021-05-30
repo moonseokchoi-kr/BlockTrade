@@ -14,8 +14,8 @@ class SongsTab extends StatefulWidget {
   static const title = 'Products';
   static const androidIcon = Icon(Icons.shopping_bag_outlined);
   static const iosIcon = Icon(CupertinoIcons.music_note);
-
-  const SongsTab({this.androidDrawer}) : super();
+  final String author;
+  const SongsTab({this.androidDrawer,this.author}) : super();
 
   final Widget androidDrawer;
 
@@ -131,6 +131,12 @@ class _SongsTabState extends State<SongsTab> {
         ],
       ),
       drawer: widget.androidDrawer,
+      floatingActionButton: FloatingActionButton(
+          child: const Icon(Icons.add),
+          onPressed: (){
+            Navigator.push(context, MaterialPageRoute(builder: (context)=>WritePosts(author: widget.author,)));
+          },
+      ),
       body: RefreshIndicator(
         key: _androidRefreshKey,
         onRefresh: _refreshData,

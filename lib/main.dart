@@ -59,6 +59,7 @@ class _UsedTradingHomePageState extends State<UsedTradingHomePage> {
           }else{
             return SongsTab(
               androidDrawer: _AndroidDrawer(),
+              author: snapshot.data.displayName,
             );
           }
         },
