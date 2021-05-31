@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_layouts/flutter_layouts.dart';
@@ -16,12 +17,39 @@ class SongDetailTab extends StatelessWidget {
     @required this.id,
     @required this.title,
     @required this.image,
+    @required this.price,
+    @required this.userName,
+    @required this.content,
+    @required this.time
   });
 
   final int id;
   final String title;
+  final String price;
+  final String userName;
+  final Timestamp time;
+  final String content;
   final Image image;
+  String setDateTime(DateTime dt){
+    DateTime now = DateTime.now();
+    if(now.month==dt.month && dt.day == now.day){
+      if(now.hour - dt.hour >0){
+        return "${now.hour-dt.hour}시간전";
+      }
+      else{
+        if(now.minute-dt.minute>0){
+          return "${now.minute-dt.minute}분전";
+        }else{
+          return "${now.second-dt.second}초전";
+        }
+      }
+    }else if(now.month == dt.month){
+      return "${now.day-dt.day}일전";
+    }else{
+      return "${now.month-dt.month}개월전";
+    }
 
+  }
   Widget _buildBody(BuildContext ctx) {
     return SafeArea(
       bottom: false,
@@ -37,6 +65,7 @@ class SongDetailTab extends StatelessWidget {
                 title: title,
                 image: image,
                 heroAnimation: AlwaysStoppedAnimation(1),
+                price: price,
               ),
               // This app uses a flightShuttleBuilder to specify the exact widget
               // to build while the hero transition is mid-flight.
@@ -69,7 +98,7 @@ class SongDetailTab extends StatelessWidget {
                           //사용자 정보 표시 하는 곳 닉네임과 신뢰토큰을 표시
                           Row(
                             children: [
-                              Text("userNickname",
+                              Text(userName,
                                 textAlign: TextAlign.right,
                                 style: TextStyle(
                                   fontSize: 16,
@@ -88,7 +117,7 @@ class SongDetailTab extends StatelessWidget {
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      Text("신뢰토큰",
+                                      Text("TCT",
                                         style: TextStyle(
                                             fontSize: 12,
                                             color: Colors.grey,
@@ -106,13 +135,12 @@ class SongDetailTab extends StatelessWidget {
                           Text(
                             title,
                             style: TextStyle(
-                                fontSize: 40, fontWeight: FontWeight.bold),
+                                fontSize: 30, fontWeight: FontWeight.bold),
                           ),
                           Row(
                             children: [
                               Container(
-                                child: Text(
-                                  'time',
+                                child: Text(setDateTime(time.toDate()),
                                   style: TextStyle(
                                       fontSize: 12,
                                       color: Colors.grey,
@@ -127,7 +155,7 @@ class SongDetailTab extends StatelessWidget {
                           ),
                           Container(
                             child: Text(
-                              '5번정도 신고 보관만 해온 제품입니다~\n유행타지 않는 기본 디자인에말린장미 색상이라 여기저기 잘 어울려요.\n37.5인데 조금 작게 나와서 240정도 되는것같습니다.\n밑창은 제가 따로 안하고 신어서\n수선집가서 하시면 새것처럼 신으실수있을것 같아요^^',
+                              content,
                               style: TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.normal),
                             ),
@@ -160,12 +188,13 @@ class SongDetailTab extends StatelessWidget {
         footer: Container(
           decoration: BoxDecoration(color: Colors.white),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               IconButton(
                 icon: const Icon(Icons.favorite_outline),
                 onPressed: () {},
               ),
-              Text('10,000원'),
+              Text("$price KLAY"),
               TextButton(onPressed: () {}, child: Text('거래하기'))
             ],
           ),

@@ -146,7 +146,7 @@ class HeroAnimatingSongCard extends StatelessWidget {
   });
 
   final String title;
-  final int price;
+  final String price;
   final Image image;
   final Animation<double> heroAnimation;
   final VoidCallback onPressed;
@@ -197,7 +197,7 @@ class HeroAnimatingSongCard extends StatelessWidget {
                         Container(
                           alignment: Alignment.centerRight,
                           child: Text(
-                            "${price.toString()} KLAY",
+                            "$price KLAY",
                             style: TextStyle(
                               fontSize: 21,
                               fontWeight: FontWeight.w500,
@@ -371,7 +371,7 @@ class _WritePostsState extends State<WritePosts> {
 
   String productName;
   String content;
-  int price;
+  String price;
   File _image;
   PostsService _postsService;
   String _downloadURL;
@@ -430,7 +430,7 @@ class _WritePostsState extends State<WritePosts> {
           ),
           TextField(
             decoration: kTextFieldDecoration.copyWith(hintText: "price"),
-            onChanged: (value){price = int.parse(value);},
+            onChanged: (value){price = value;},
           ),
           SizedBox(
             height: 10,

@@ -5,7 +5,7 @@ class Posts{
   final String author;
   final String content;
   final String productName;
-  final int price;
+  final String price;
   final String picture;
   const Posts({this.author, this.content,this.productName, this.price, this.picture });
 
@@ -28,9 +28,8 @@ class UpdatePosts{
 
   final String content;
   final String productName;
-  final int price;
+  final String price;
   final String document;
-
   const UpdatePosts({this.document, this.content,this.productName, this.price});
 
   Map<String,dynamic> makeUpdateData(){

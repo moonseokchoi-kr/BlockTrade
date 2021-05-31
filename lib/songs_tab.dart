@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -33,57 +34,61 @@ class _SongsTabState extends State<SongsTab> {
 
   @override
   void initState() {
-    _setData();
     super.initState();
   }
 
-  void _setData() {
-    colors = getRandomColors(_itemsLength);
-    songNames = getRandomNames(_itemsLength);
-  }
-
-  Future<void> _refreshData() {
-    return Future.delayed(
-      // This is just an arbitrary delay that simulates some network activity.
-      const Duration(seconds: 2),
-      () => setState(() => _setData()),
-    );
-  }
-
-  Widget _listBuilder(BuildContext context, int index) {
-    if (index >= _itemsLength) return Container();
-
-    // Show a slightly different color palette. Show poppy-ier colors on iOS
-    // due to lighter contrasting bars and tone it down on Android.
-
-    return SafeArea(
-      top: false,
-      bottom: false,
-      child: Hero(
-        tag: index,
-        child: HeroAnimatingSongCard(
-          title: songNames[index],
-          image: Image.network(
-            "https://funkeys.co.kr/data/item/1620784352/VARMILOMA108MSEAMELODY_KR_F.MAIN.jpg",
-            fit: BoxFit.fill,
-            height: 250,
-          ),
-          heroAnimation: AlwaysStoppedAnimation(0),
-          onPressed: () => Navigator.of(context).push<void>(
-            MaterialPageRoute(
-              builder: (context) => SongDetailTab(
-                id: index,
-                title: songNames[index],
-                image: Image.network(
-                  "https://funkeys.co.kr/data/item/1620784352/VARMILOMA108MSEAMELODY_KR_F.MAIN.jpg",
-                  fit: BoxFit.fill,
-                  height: 250,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
+  Widget _listBuilder(){
+    return StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance.collection('posts').snapshots(),
+        builder: (context,snapshot){
+            if(snapshot.hasError){
+              return Text('Something went wrong');
+            }
+            if(snapshot.connectionState == ConnectionState.waiting) {
+              return Text("Loding");
+            }
+            final items= snapshot.data.docs;
+            return ListView.builder(
+                itemCount: items.length,
+                itemBuilder:(context,index){
+                  final item = items[index];
+                  return SafeArea(
+                    top: false,
+                    bottom: false,
+                    child: Hero(
+                      tag: index,
+                      child: HeroAnimatingSongCard(
+                        title: item['productName'],
+                        image: Image.network(
+                          item['picture'],
+                          fit: BoxFit.fill,
+                          height: 250,
+                        ),
+                        price: item['price'],
+                        heroAnimation: AlwaysStoppedAnimation(0),
+                        onPressed: () => Navigator.of(context).push<void>(
+                          MaterialPageRoute(
+                            builder: (context) => SongDetailTab(
+                              id: index,
+                              title: item['productName'],
+                              image: Image.network(
+                                item['picture'],
+                                fit: BoxFit.fill,
+                                height: 250,
+                              ),
+                              price: item['price'],
+                              content: item['content'],
+                              time: item['time_stamp'],
+                              userName: item['author'],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }
+            );
+    }
     );
   }
 
@@ -137,15 +142,7 @@ class _SongsTabState extends State<SongsTab> {
             Navigator.push(context, MaterialPageRoute(builder: (context)=>WritePosts(author: widget.author,)));
           },
       ),
-      body: RefreshIndicator(
-        key: _androidRefreshKey,
-        onRefresh: _refreshData,
-        child: ListView.builder(
-          padding: EdgeInsets.symmetric(vertical: 12),
-          itemCount: _itemsLength,
-          itemBuilder: _listBuilder,
-        ),
-      ),
+      body:_listBuilder(),
     );
   }
 
