@@ -484,6 +484,8 @@ class _WritePostsState extends State<WritePosts> {
     print(_downloadURL);
   }
 }
+
+
 const kTextFieldDecoration = InputDecoration(
   filled: true,
   fillColor: Colors.white,

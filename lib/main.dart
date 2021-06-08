@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'songs_tab.dart';
 import 'login.dart';
-
+import 'user.dart';
 void main() => runApp(BlockTradeApp());
 
 class BlockTradeApp extends StatelessWidget {
@@ -48,6 +48,7 @@ class UsedTradingHomePage extends StatefulWidget {
 }
 
 class _UsedTradingHomePageState extends State<UsedTradingHomePage> {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,7 +60,7 @@ class _UsedTradingHomePageState extends State<UsedTradingHomePage> {
           }else{
             return SongsTab(
               androidDrawer: _AndroidDrawer(),
-              author: snapshot.data.displayName,
+              author: FirebaseAuth.instance.currentUser.uid,
             );
           }
         },
@@ -69,6 +70,7 @@ class _UsedTradingHomePageState extends State<UsedTradingHomePage> {
 }
 
 class _AndroidDrawer extends StatelessWidget {
+ final _currentUser = FirebaseAuth.instance.currentUser;
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -77,14 +79,25 @@ class _AndroidDrawer extends StatelessWidget {
         children: [
           DrawerHeader(
             decoration: BoxDecoration(color: Colors.green),
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 20),
-              child: Icon(
-                Icons.account_circle,
-                color: Colors.green.shade800,
-                size: 96,
-              ),
-            ),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 20),
+                  child: Icon(
+                    Icons.account_circle,
+                    color: Colors.green.shade800,
+                    size: 96,
+                  ),
+                ),
+                StreamBuilder(
+                    stream: collection.where('id', isEqualTo: _currentUser.uid).snapshots(),
+                    builder: (context, snapshot){
+                      final items = snapshot.data.docs;
+                      return Text('${items[0]['username']}님 환영합니다');
+                    }
+                ),
+              ],
+            )
           ),
           ListTile(
             leading: SongsTab.androidIcon,
