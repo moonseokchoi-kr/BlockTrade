@@ -8,25 +8,25 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'song_detail_tab.dart';
+import 'product_detial_tab.dart';
 import 'utils.dart';
 import 'widgets.dart';
 import 'user.dart';
 
-class SongsTab extends StatefulWidget {
+class ProductsTab extends StatefulWidget {
   static const title = 'Products';
   static const androidIcon = Icon(Icons.shopping_bag_outlined);
   static const iosIcon = Icon(CupertinoIcons.music_note);
   final String author;
-  const SongsTab({this.androidDrawer,this.author}) : super();
+  const ProductsTab({this.androidDrawer,this.author}) : super();
 
   final Widget androidDrawer;
 
   @override
-  _SongsTabState createState() => _SongsTabState();
+  _ProductsTabState createState() => _ProductsTabState();
 }
 
-class _SongsTabState extends State<SongsTab> {
+class _ProductsTabState extends State<ProductsTab> {
   static const _itemsLength = 50;
   final _androidRefreshKey = GlobalKey<RefreshIndicatorState>();
 
@@ -69,7 +69,7 @@ class _SongsTabState extends State<SongsTab> {
                         heroAnimation: AlwaysStoppedAnimation(0),
                         onPressed: () => Navigator.of(context).push<void>(
                           MaterialPageRoute(
-                            builder: (context) => SongDetailTab(
+                            builder: (context) => ProductDetailTab(
                               id: index,
                               title: item['productName'],
                               image: Image.network(
@@ -124,7 +124,7 @@ class _SongsTabState extends State<SongsTab> {
   Widget _buildAndroid(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(SongsTab.title),
+        title: Text(ProductsTab.title),
         actions: [
           IconButton(
             icon: Icon(Icons.refresh),

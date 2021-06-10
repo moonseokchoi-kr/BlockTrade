@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:uuid/uuid.dart';
 import 'dart:io';
 import 'posts.dart';
 import 'postsService.dart';
@@ -375,9 +376,11 @@ class _WritePostsState extends State<WritePosts> {
   File _image;
   PostsService _postsService;
   String _downloadURL;
+  var uuid = Uuid();
   @override
   Widget build(BuildContext context) {
     _postsService = PostsService();
+    var id = uuid.v1();
     return Scaffold(
       appBar: AppBar(
         title: AutoSizeText("Write Post"),
@@ -388,7 +391,7 @@ class _WritePostsState extends State<WritePosts> {
           IconButton(
             onPressed: (){
               Posts p = new Posts(productName: productName, author: widget.author, price: price, content: content, picture: _downloadURL);
-              _postsService.putPost(p);
+              _postsService.putPost(p,id);
               Navigator.pop(context);
             },
             icon:Icon(Icons.save),
@@ -414,13 +417,13 @@ class _WritePostsState extends State<WritePosts> {
               RaisedButton(
                 child: AutoSizeText("Gallery"),
                 onPressed: () {
-                  _uploadImageToStorage(ImageSource.gallery);
+                  _uploadImageToStorage(ImageSource.gallery,id);
                 },
               ),
               RaisedButton(
                 child: AutoSizeText("Camera"),
                 onPressed: () {
-                  _uploadImageToStorage(ImageSource.camera);
+                  _uploadImageToStorage(ImageSource.camera, id);
                 },
               ),
             ],
@@ -462,8 +465,8 @@ class _WritePostsState extends State<WritePosts> {
       ),
     );
   }
-  void _uploadImageToStorage(ImageSource source) async {
-    final picker =  ImagePicker();
+  void _uploadImageToStorage(ImageSource source, id) async {
+    final picker = ImagePicker();
     final image = await picker.getImage(source: source);
 
     if (image == null) return;
@@ -473,17 +476,18 @@ class _WritePostsState extends State<WritePosts> {
     firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
         .ref()
         .child('posts')
-        .child("${_postsService.getCurrentID()}.jpg");
+        .child("$id.jpg");
 
     firebase_storage.UploadTask uploadTask = ref.putFile(_image);
     Pattern linkPattern = '^.*.media';
     RegExp linkReg = RegExp(linkPattern);
     await uploadTask.whenComplete(() => ref.getDownloadURL().then((value) =>
     _downloadURL =linkReg.stringMatch(value)));
-
     print(_downloadURL);
   }
+
 }
+
 
 
 const kTextFieldDecoration = InputDecoration(

@@ -37,10 +37,13 @@ dependencies:
   image_picker: ^0.7.5+3
   firebase_storage: ^8.1.0
   auto_size_text: ^2.1.0
+  uuid: ^3.0.4
+  flutter_layouts: ^0.0.2+1
+  intl: ^0.17.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_layouts: ^0.0.2+1
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

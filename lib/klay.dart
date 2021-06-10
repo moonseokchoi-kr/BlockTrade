@@ -1,5 +1,4 @@
-import 'dart:convert';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 ///kas 서비스와 관련된 클래스를정의하는곳
 
@@ -45,8 +44,8 @@ class TransferResult{
 /// 영수증 생성클래스
 /// 2차 거래 완료시 nft와 klaytransferhash 추가 trade 변수 true로
 ///
-class Recipient{
-  final int id;
+class Receipt{
+  final String id;
   final String productName;
   final String seller;
   final String buyer;
@@ -58,7 +57,7 @@ class Recipient{
   final int tradeAt;
   bool trade = false;
 
-  Recipient({
+  Receipt({
     @required this.id,
     @required this.productName,
     @required this.seller,

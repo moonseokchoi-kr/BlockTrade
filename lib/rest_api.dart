@@ -22,7 +22,7 @@ final chainId= '1001';
 /// 입력 보낼 계정, 받는 계정, 클레이의 양, 영수증의 데이터
 /// https://refs.klaytnapi.com/ko/wallet/latest#operation/ValueTransferTransaction
 
-Future<TransferResult> transferKlay(String to, String from, num value, Recipient recipient) async{
+Future<TransferResult> transferKlay(String to, String from, num value, Receipt recipient) async{
   final request = jsonEncode({"from": from,
     "to": to,
     "value": calKLayAmount(value),

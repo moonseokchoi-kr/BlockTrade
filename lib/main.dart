@@ -1,10 +1,10 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:block_trade/rest_api.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:block_trade/tradelist.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'songs_tab.dart';
+import 'products_tab.dart';
 import 'login.dart';
 import 'user.dart';
 void main() => runApp(BlockTradeApp());
@@ -70,7 +70,7 @@ class _UsedTradingHomePageState extends State<UsedTradingHomePage> {
                   }else{
                     final items = snapshot.data.docs;
                     print("wallet_address: ${items[0]["wallet_address"]}");
-                    return SongsTab(
+                    return ProductsTab(
                       androidDrawer: _AndroidDrawer(currentUser: FirebaseAuth.instance.currentUser, address: items[0]["wallet_address"],),
                       author: FirebaseAuth.instance.currentUser.uid,
                     );
@@ -191,8 +191,8 @@ class _AndroidDrawerState extends State<_AndroidDrawer> {
               )
           ),
           ListTile(
-            leading: SongsTab.androidIcon,
-            title: Text(SongsTab.title),
+            leading: ProductsTab.androidIcon,
+            title: Text(ProductsTab.title),
             onTap: () {
               Navigator.pop(context);
             },
@@ -201,7 +201,7 @@ class _AndroidDrawerState extends State<_AndroidDrawer> {
             leading: Icon(Icons.shopping_bag),
             title: Text("구매내역"),
             onTap: () {
-              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context)=> BuyListWidget(user: FirebaseAuth.instance.currentUser.uid,)));
             },
           ),
           ListTile(

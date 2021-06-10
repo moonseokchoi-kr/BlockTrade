@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:block_trade/pay_widget.dart';
 import 'package:block_trade/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -14,24 +15,29 @@ import 'widgets.dart';
 ///
 /// On Android, this page sits at the top of your app. On iOS, this page is on
 /// top of the songs tab's content but is below the tab bar itself.
-class SongDetailTab extends StatelessWidget {
-  const SongDetailTab({
-    @required this.id,
+///
+
+class ProductDetailTab extends StatefulWidget {
+  const ProductDetailTab({Key key, @required this.id,
     @required this.title,
     @required this.image,
     @required this.price,
     @required this.userName,
     @required this.content,
-    @required this.time
-  });
+    @required this.time}) : super(key: key);
 
-  final int id;
-  final String title;
-  final String price;
-  final String userName;
-  final Timestamp time;
-  final String content;
-  final Image image;
+  final id;
+  final title;
+  final image;
+  final price;
+  final userName;
+  final content;
+  final time;
+  @override
+  _ProductDetailTabState createState() => _ProductDetailTabState();
+}
+
+class _ProductDetailTabState extends State<ProductDetailTab> {
   String _setDateTime(DateTime dt){
     DateTime now = DateTime.now();
     if(now.month==dt.month && dt.day == now.day){
@@ -54,16 +60,16 @@ class SongDetailTab extends StatelessWidget {
   }
   Widget _usernameText(){
     return StreamBuilder(
-      stream: collection.where('id', isEqualTo: userName).snapshots(),
+      stream: collection.where('id', isEqualTo: widget.userName).snapshots(),
       builder: (context, snapShots){
-          final items = snapShots.data.docs;
-          return AutoSizeText(
-            items[0]['username'],
-              style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              ),
-          );
+        final items = snapShots.data.docs;
+        return AutoSizeText(
+          items[0]['username'],
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        );
       },
     );
   }
@@ -77,12 +83,12 @@ class SongDetailTab extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Hero(
-              tag: id,
+              tag: widget.id,
               child: HeroAnimatingSongCard(
-                title: title,
-                image: image,
+                title: widget.title,
+                image: widget.image,
                 heroAnimation: AlwaysStoppedAnimation(1),
-                price: price,
+                price: widget.price,
               ),
               // This app uses a flightShuttleBuilder to specify the exact widget
               // to build while the hero transition is mid-flight.
@@ -91,8 +97,9 @@ class SongDetailTab extends StatelessWidget {
               flightShuttleBuilder: (context, animation, flightDirection,
                   fromHeroContext, toHeroContext) {
                 return HeroAnimatingSongCard(
-                  title: title,
-                  image: image,
+                  title: widget.title,
+                  image: widget.image,
+                  price : widget.price,
                   heroAnimation: animation,
                 );
               },
@@ -144,14 +151,14 @@ class SongDetailTab extends StatelessWidget {
                             color: Colors.grey.shade300,
                           ),
                           AutoSizeText(
-                            title,
+                            widget.title,
                             style: TextStyle(
                                 fontSize: 30, fontWeight: FontWeight.bold),
                           ),
                           Row(
                             children: [
                               Container(
-                                child: AutoSizeText(_setDateTime(time.toDate()),
+                                child: AutoSizeText(_setDateTime(widget.time.toDate()),
                                   style: TextStyle(
                                       fontSize: 12,
                                       color: Colors.grey,
@@ -166,7 +173,7 @@ class SongDetailTab extends StatelessWidget {
                           ),
                           Container(
                             child: AutoSizeText(
-                              content,
+                              widget.content,
                               style: TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.normal),
                             ),
@@ -205,12 +212,26 @@ class SongDetailTab extends StatelessWidget {
                 icon: const Icon(Icons.favorite_outline),
                 onPressed: () {},
               ),
-              AutoSizeText("$price KLAY"),
-              TextButton(onPressed: () {}, child: AutoSizeText('거래하기'))
-            ],
+              AutoSizeText("${widget.price} KLAY"),
+              Container(
+                decoration: BoxDecoration( color: Colors.orangeAccent,
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(40),
+                  ),
+                ),
+                child: TextButton(
+                    onPressed: () { Navigator.push(context, MaterialPageRoute(builder: (context)=> PayWidget(klay:widget.price,productName: widget.title,seller: widget.userName,)));},
+                    child:AutoSizeText('거래하기'
+                    ,style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+              ),
           ),
+        ],
         ),
       ),
+    ),
     );
   }
 
@@ -220,7 +241,7 @@ class SongDetailTab extends StatelessWidget {
 
   Widget _buildAndroid(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(title: Text(widget.title)),
       body: _buildBody(context),
     );
   }
@@ -232,3 +253,4 @@ class SongDetailTab extends StatelessWidget {
     );
   }
 }
+
