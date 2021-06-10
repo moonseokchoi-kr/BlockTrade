@@ -7,7 +7,7 @@ class LoginWidget extends StatelessWidget {
   Future<UserCredential> signInWithGoogle() async{
     final GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
     final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-    final GoogleAuthCredential credential = await GoogleAuthProvider.credential(
+    final GoogleAuthCredential credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );

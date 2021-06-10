@@ -82,8 +82,8 @@ Future<Account> createAccount() async{
   }
 }
 
-Future<String> getBalance() async{
-  final request = jsonEncode({"method":"klay_getBalance","params":["0xA0E20bf364865540da3A655c4412Ab75980480F6", "latest"] ,"id":1});
+Future<String> getBalance(String account) async{
+  final request = jsonEncode({"method":"klay_getBalance","params":["$account", "latest"] ,"id":1});
   final response =  await http.post(
       Uri.parse('https://node-api.klaytnapi.com/v1/klaytn'),
       headers: {
@@ -221,5 +221,5 @@ String calKLAYValue(String radixString) {
 }
 
 String calKLayAmount(num value){
-  return BigInt.from(value * pow(10,18)).toRadixString(16);
+  return (BigInt.from(value)*BigInt.from(10).pow(18)).toRadixString(16);
 }

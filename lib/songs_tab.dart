@@ -28,7 +28,6 @@ class SongsTab extends StatefulWidget {
 
 class _SongsTabState extends State<SongsTab> {
   static const _itemsLength = 50;
-  final _currentUser = FirebaseAuth.instance.currentUser;
   final _androidRefreshKey = GlobalKey<RefreshIndicatorState>();
 
   List<MaterialColor> colors;
@@ -37,7 +36,6 @@ class _SongsTabState extends State<SongsTab> {
   @override
   void initState() {
     super.initState();
-    createUser(_currentUser);
   }
 
   Widget _listBuilder(){

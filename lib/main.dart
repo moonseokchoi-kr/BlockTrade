@@ -1,3 +1,6 @@
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:block_trade/rest_api.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -58,10 +61,21 @@ class _UsedTradingHomePageState extends State<UsedTradingHomePage> {
           if(snapshot.data == null){
             return LoginWidget();
           }else{
-            return SongsTab(
-              androidDrawer: _AndroidDrawer(),
-              author: FirebaseAuth.instance.currentUser.uid,
-            );
+            createUser(FirebaseAuth.instance.currentUser);
+            return StreamBuilder(
+              stream: collection.where('id', isEqualTo: FirebaseAuth.instance.currentUser.uid).snapshots(),
+                builder: (context,snapshot){
+                  if(!snapshot.hasData){
+                    return CircularProgressIndicator();
+                  }else{
+                    final items = snapshot.data.docs;
+                    print("wallet_address: ${items[0]["wallet_address"]}");
+                    return SongsTab(
+                      androidDrawer: _AndroidDrawer(currentUser: FirebaseAuth.instance.currentUser, address: items[0]["wallet_address"],),
+                      author: FirebaseAuth.instance.currentUser.uid,
+                    );
+                  }
+                });
           }
         },
       ),
@@ -69,8 +83,57 @@ class _UsedTradingHomePageState extends State<UsedTradingHomePage> {
   }
 }
 
-class _AndroidDrawer extends StatelessWidget {
- final _currentUser = FirebaseAuth.instance.currentUser;
+class _AndroidDrawer extends StatefulWidget {
+  const _AndroidDrawer({Key key, this.currentUser, @required this.address}) : super(key: key);
+  final currentUser;
+  final address;
+  @override
+  _AndroidDrawerState createState() => _AndroidDrawerState();
+}
+
+class _AndroidDrawerState extends State<_AndroidDrawer> {
+  @override
+  void initState(){
+
+    super.initState();
+  }
+  Widget _getKlay() {
+    return FutureBuilder(
+      future: getBalance(widget.address),
+        builder: (context,snapshot){
+          if(snapshot.hasData == null){
+            return CircularProgressIndicator();
+          }
+          else{
+            return AutoSizeText(
+              '${snapshot.data} KLAY',
+              style: TextStyle(
+                color: Colors.black54,
+                fontSize: 16,
+              ),
+            );
+          }
+        });
+  }
+  Widget _getTCT() {
+    return FutureBuilder(
+        future: getTCTBalance(widget.address),
+        builder: (context,snapshot){
+          if(!snapshot.hasData){
+            return CircularProgressIndicator();
+          }
+          else{
+            return AutoSizeText(
+              '${snapshot.data} TCT',
+              style: TextStyle(
+                color: Colors.black54,
+                fontSize: 16,
+              ),
+            );
+          }
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -78,26 +141,54 @@ class _AndroidDrawer extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           DrawerHeader(
-            decoration: BoxDecoration(color: Colors.green),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 20),
-                  child: Icon(
-                    Icons.account_circle,
-                    color: Colors.green.shade800,
-                    size: 96,
+              decoration: BoxDecoration( color: Colors.grey[300],
+                borderRadius: BorderRadius.all(
+                  Radius.circular(40),
+                ),
+                boxShadow: [
+                  BoxShadow( color: Colors.grey[500], offset: Offset(4.0, 4.0), blurRadius: 15.0, spreadRadius: 1.0, ),
+                  BoxShadow( color: Colors.white, offset: Offset(-4.0, -4.0), blurRadius: 15.0, spreadRadius: 1.0, ),
+                ],
+              ),
+
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  AutoSizeText(
+                    "${widget.currentUser.displayName}님",
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
                   ),
-                ),
-                StreamBuilder(
-                    stream: collection.where('id', isEqualTo: _currentUser.uid).snapshots(),
-                    builder: (context, snapshot){
-                      final items = snapshot.data.docs;
-                      return Text('${items[0]['username']}님 환영합니다');
-                    }
-                ),
-              ],
-            )
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Container(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Image(image: AssetImage('assets/trust_token_icon.png'), height: 50, width: 50,),
+                            _getTCT(),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Image(image: AssetImage('assets/klay_icon.png')),
+                            _getKlay(),
+                          ],
+                        ),
+                      )
+                    ],
+                  )
+                ],
+              )
           ),
           ListTile(
             leading: SongsTab.androidIcon,
@@ -106,7 +197,20 @@ class _AndroidDrawer extends StatelessWidget {
               Navigator.pop(context);
             },
           ),
-
+          ListTile(
+            leading: Icon(Icons.shopping_bag),
+            title: Text("구매내역"),
+            onTap: () {
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.list),
+            title: Text("판매내역"),
+            onTap: () {
+              Navigator.pop(context);
+            },
+          ),
           // Long drawer contents are often segmented.
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -117,3 +221,4 @@ class _AndroidDrawer extends StatelessWidget {
     );
   }
 }
+

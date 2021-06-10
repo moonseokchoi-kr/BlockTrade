@@ -56,9 +56,11 @@ void addUser(TradeUser user) async{
 
 void createUser(currentUser) async {
   var account;
+  var tct;
   collection.where('id', isEqualTo: currentUser.uid).get().then((QuerySnapshot querySnapshot) async =>{
     if(querySnapshot.docs.isEmpty){
       account = await createAccount(),
+      tct = await createTCT(account.address, 100),
         print('Start CreateUser'),
         addUser(TradeUser(id: currentUser.uid,
                 username: currentUser.displayName,

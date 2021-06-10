@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:block_trade/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +32,7 @@ class SongDetailTab extends StatelessWidget {
   final Timestamp time;
   final String content;
   final Image image;
-  String setDateTime(DateTime dt){
+  String _setDateTime(DateTime dt){
     DateTime now = DateTime.now();
     if(now.month==dt.month && dt.day == now.day){
       if(now.hour - dt.hour >0){
@@ -49,6 +51,21 @@ class SongDetailTab extends StatelessWidget {
       return "${now.month-dt.month}개월전";
     }
 
+  }
+  Widget _usernameText(){
+    return StreamBuilder(
+      stream: collection.where('id', isEqualTo: userName).snapshots(),
+      builder: (context, snapShots){
+          final items = snapShots.data.docs;
+          return AutoSizeText(
+            items[0]['username'],
+              style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              ),
+          );
+      },
+    );
   }
   Widget _buildBody(BuildContext ctx) {
     return SafeArea(
@@ -98,26 +115,20 @@ class SongDetailTab extends StatelessWidget {
                           //사용자 정보 표시 하는 곳 닉네임과 신뢰토큰을 표시
                           Row(
                             children: [
-                              Text(userName,
-                                textAlign: TextAlign.right,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                              _usernameText(),
                               Container(
                                 margin: EdgeInsets.only(left: 180),
                                 child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children:[
-                                      Text("100",
+                                      AutoSizeText("100",
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      Text("TCT",
+                                      AutoSizeText("TCT",
                                         style: TextStyle(
                                             fontSize: 12,
                                             color: Colors.grey,
@@ -132,7 +143,7 @@ class SongDetailTab extends StatelessWidget {
                             height: 0,
                             color: Colors.grey.shade300,
                           ),
-                          Text(
+                          AutoSizeText(
                             title,
                             style: TextStyle(
                                 fontSize: 30, fontWeight: FontWeight.bold),
@@ -140,7 +151,7 @@ class SongDetailTab extends StatelessWidget {
                           Row(
                             children: [
                               Container(
-                                child: Text(setDateTime(time.toDate()),
+                                child: AutoSizeText(_setDateTime(time.toDate()),
                                   style: TextStyle(
                                       fontSize: 12,
                                       color: Colors.grey,
@@ -154,7 +165,7 @@ class SongDetailTab extends StatelessWidget {
                             color: Colors.white,
                           ),
                           Container(
-                            child: Text(
+                            child: AutoSizeText(
                               content,
                               style: TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.normal),
@@ -166,7 +177,7 @@ class SongDetailTab extends StatelessWidget {
                             color: Colors.grey,
                           ),
                           Container(
-                            child: Text(
+                            child: AutoSizeText(
                               '추천 상품',
                               style: TextStyle(
                                   fontSize: 30, fontWeight: FontWeight.bold),
@@ -194,8 +205,8 @@ class SongDetailTab extends StatelessWidget {
                 icon: const Icon(Icons.favorite_outline),
                 onPressed: () {},
               ),
-              Text("$price KLAY"),
-              TextButton(onPressed: () {}, child: Text('거래하기'))
+              AutoSizeText("$price KLAY"),
+              TextButton(onPressed: () {}, child: AutoSizeText('거래하기'))
             ],
           ),
         ),

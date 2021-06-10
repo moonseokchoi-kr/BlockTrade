@@ -51,10 +51,11 @@ class Recipient{
   final String seller;
   final String buyer;
   final String trustToken;
+  final String klay;
   final String nftHash;
   final String klayTransferHash;
   final int createdAt;
-  final int tradeTime;
+  final int tradeAt;
   bool trade = false;
 
   Recipient({
@@ -64,24 +65,27 @@ class Recipient{
     @required this.buyer,
     @required this.trustToken,
     @required this.createdAt,
-    @required this.tradeTime,
+    @required this.tradeAt,
+    @required this.klay,
     this.nftHash,
-    this.klayTransferHash
+    this.klayTransferHash,
+    this.trade,
   });
 
-  factory Recipient.fromJson(Map<String, dynamic> json){
-    return Recipient(
-        id: json['id'],
-        productName: json['productName'],
-        seller: json['seller'],
-        buyer: json['buyer'],
-        trustToken: json['trustToken'],
-        createdAt: json['createdAt'],
-        tradeTime: json['tradeTime'],
-       );
-  }
-  String toJson(){
-    return jsonEncode(this);
+  Map<String, dynamic> toMap(){
+    return {
+      'id':id,
+      'productName':productName,
+      'buyer':buyer,
+      'seller': seller ,
+      'trust_token':trustToken,
+      'nft_hash':nftHash,
+      'klay_tranfer_hash':klayTransferHash,
+      'klay':klay,
+      'createAt':createdAt,
+      'tradeAt':tradeAt,
+      'trade?':trade
+    };
   }
 
 }

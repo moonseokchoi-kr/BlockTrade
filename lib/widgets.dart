@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +11,6 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'dart:io';
 import 'posts.dart';
 import 'postsService.dart';
-
 /// A simple widget that builds different things on different platforms.
 class PlatformWidget extends StatelessWidget {
   const PlatformWidget({
@@ -186,17 +186,17 @@ class HeroAnimatingSongCard extends StatelessWidget {
                       children: [
                         Container(
                           alignment: Alignment.centerLeft,
-                          child: Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 21,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
+                          child: AutoSizeText(
+                            title,
+                            style: TextStyle(
+                              fontSize: 21,
+                              fontWeight: FontWeight.w500,
+                             ),
+                           ),
                         ),
                         Container(
                           alignment: Alignment.centerRight,
-                          child: Text(
+                          child: AutoSizeText(
                             "$price KLAY",
                             style: TextStyle(
                               fontSize: 21,
@@ -301,7 +301,7 @@ void showChoices(BuildContext context, List<String> choices) {
                   mainAxisSize: MainAxisSize.min,
                   children: List<Widget>.generate(choices.length, (index) {
                     return RadioListTile<int>(
-                      title: Text(choices[index]),
+                      title: AutoSizeText(choices[index]),
                       value: index,
                       groupValue: selectedRadio,
                       onChanged: (value) {
@@ -340,7 +340,7 @@ void showChoices(BuildContext context, List<String> choices) {
               scrollController: FixedExtentScrollController(initialItem: 1),
               children: List<Widget>.generate(choices.length, (index) {
                 return Center(
-                  child: Text(
+                  child: AutoSizeText(
                     choices[index],
                     style: TextStyle(
                       fontSize: 21,
@@ -380,7 +380,7 @@ class _WritePostsState extends State<WritePosts> {
     _postsService = PostsService();
     return Scaffold(
       appBar: AppBar(
-        title: Text("Write Post"),
+        title: AutoSizeText("Write Post"),
         leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: (){
           Navigator.pop(context);
         }),
@@ -412,13 +412,13 @@ class _WritePostsState extends State<WritePosts> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               RaisedButton(
-                child: Text("Gallery"),
+                child: AutoSizeText("Gallery"),
                 onPressed: () {
                   _uploadImageToStorage(ImageSource.gallery);
                 },
               ),
               RaisedButton(
-                child: Text("Camera"),
+                child: AutoSizeText("Camera"),
                 onPressed: () {
                   _uploadImageToStorage(ImageSource.camera);
                 },
