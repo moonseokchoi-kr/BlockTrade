@@ -28,7 +28,6 @@ class TransferResult{
   });
 
   factory TransferResult.fromJson(Map<String, dynamic> json){
-    print(json['transactionHash']);
     return TransferResult(
         from: json['from'],
         input: json['input'],
@@ -51,10 +50,10 @@ class Receipt{
   final String buyer;
   final String trustToken;
   final String klay;
-  final String nftHash;
-  final String klayTransferHash;
+  String nftHash;
+  String klayTransferHash;
   final int createdAt;
-  final int tradeAt;
+  int tradeAt;
   bool trade = false;
 
   Receipt({
@@ -70,7 +69,20 @@ class Receipt{
     this.klayTransferHash,
     this.trade,
   });
-
+  factory Receipt.fromJson(Map<String, dynamic> json){
+    return Receipt(
+        id: json['id'],
+        productName: json['productName'],
+        seller: json['seller'], buyer: json['buyer'],
+        trustToken: json['trust_token'],
+        createdAt: json['createAt'],
+        tradeAt: json['tradeAt'],
+        klay: json['klay'],
+        nftHash: json['nft_hash'],
+        klayTransferHash: json['klay_transfer_token'],
+        trade: json['trade?']
+    );
+  }
   Map<String, dynamic> toMap(){
     return {
       'id':id,
@@ -86,7 +98,12 @@ class Receipt{
       'trade?':trade
     };
   }
-
+  void updateHash(String transferHash, String nftHash, int tradeAt){
+    this.nftHash = nftHash;
+    this.klayTransferHash = klayTransferHash;
+    this.trade = true;
+    this.tradeAt = tradeAt;
+  }
 }
 ///KAS 서비스 계정생성결과를 받는 클래스
 class Account{
@@ -132,7 +149,6 @@ class Block {
   });
 
   factory Block.fromJson(Map<String, dynamic> json) {
-    print(json['result']);
     return Block(
       jsonRPC: json['jsonrpc'],
       id: json['id'],
@@ -150,7 +166,6 @@ class TCT{
     @required this.transaction
   });
   factory TCT.fromJson(Map<String,dynamic> json){
-    print(json['transactionHash']);
     return TCT(
       status: json['status'],
       transaction: json['transactionHash'],

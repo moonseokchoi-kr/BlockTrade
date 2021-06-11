@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:http/http.dart' as http;
 import 'klay.dart';
 
@@ -54,8 +52,6 @@ Future<String> getTCTBalance(String owner) async{
   );
   if (response.statusCode == 200){
     final json = jsonDecode(response.body);
-    print(json['balance']);
-    print(json['decimals']);
     return calKLAYValue(json['balance']);
   }else{
     print(response.body);

@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'klay.dart';
 import 'user.dart';
 class BuyListWidget extends StatefulWidget {
   const BuyListWidget({Key key, @required this.user}) : super(key: key);
@@ -14,7 +15,6 @@ class BuyListWidget extends StatefulWidget {
 class _BuyListWidgetState extends State<BuyListWidget> {
   @override
   void initState() {
-    // TODO: implement initState
     initializeDateFormatting();
     super.initState();
   }
@@ -31,7 +31,10 @@ class _BuyListWidgetState extends State<BuyListWidget> {
             },)
         ],
       ),
-      body: _list(),
+      body: Container(
+        padding: EdgeInsets.all(12),
+        child: _buildExpansionPanelList(),
+      )
     );
   }
 
@@ -39,19 +42,22 @@ class _BuyListWidgetState extends State<BuyListWidget> {
     return StreamBuilder(
       stream: collection.where('id', isEqualTo: id).snapshots(),
       builder: (context, snapShots) {
-        final items = snapShots.data.docs;
-        return AutoSizeText(
-          '판매자: ${items[0]['username']}',
-          style: TextStyle(
-            fontSize: 16,
-          ),
-        );
-      },
+        if (snapShots.data == null) {
+          return CircularProgressIndicator();
+        } else {
+          final items = snapShots.data.docs;
+          return AutoSizeText(
+            '판매자: ${items[0]['username']}',
+            style: TextStyle(
+              fontSize: 16,
+            ),
+          );
+        }
+      }
     );
   }
   Widget _setChangeButton(int time){
     var now = DateTime.now().toUtc().millisecondsSinceEpoch;
-    print("now: $now\n trade:$time\n compare:${time<now}");
     if(now<time){
       return Container(
       decoration: BoxDecoration(
@@ -106,77 +112,108 @@ class _BuyListWidgetState extends State<BuyListWidget> {
     var timeFormatter = DateFormat.Hms();
     return '${dayFormatter.format(unixTime)} ${timeFormatter.format(unixTime)}';
   }
-  Widget _list(){
+  Widget _buildExpansionPanelList(){
     return StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('receipt').where('buyer', isEqualTo: widget.user ).snapshots(),
-        builder: (context,snapshot){
-          final items = snapshot.data.docs;
-          return ListView.builder(
-              itemCount: items.length,
-              itemBuilder: (context, index){
-                final item = items[index];
-                return SafeArea(
-                  child: Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.grey[300],
-                        width: 1,
-                      )
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.only(bottom: 4),
-                          child: AutoSizeText(
-                            '상품명: ${item["productName"]}',
+        builder: (context,snapshot) {
+          if (snapshot.data == null) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else {
+            final items = snapshot.data.docs;
+            List<ReceiptNode> itemData = generateItems(items);
+            return ListView.builder(
+              itemCount: itemData.length,
+              itemBuilder: (BuildContext context, int index) {
+                print("chandge1 : ${itemData[index].isExpanded}");
+                return ExpansionPanelList(
+                  animationDuration: Duration(milliseconds: 1000),
+                  dividerColor: Colors.red,
+                  elevation: 1,
+                  children: [
+                    ExpansionPanel(
+                      body: Container(
+                        padding: EdgeInsets.all(10),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
+                            AutoSizeText(
+                              '금액:${itemData[index].receipt.klay} KLAY',
+                              style: TextStyle(
+                                  color: Colors.grey[700],
+                                  fontSize: 15,
+                                  letterSpacing: 0.3,
+                                  height: 1.3),
+                            ),
+                            _usernameText(itemData[index].receipt.seller),
+                            AutoSizeText(
+                              '구매시간:${_convertUnixTime(itemData[index].receipt.createdAt)} ',
+                              style: TextStyle(
+                                  color: Colors.grey[700],
+                                  fontSize: 15,
+                                  letterSpacing: 0.3,
+                                  height: 1.3),
+                            ),
+                            AutoSizeText(
+                              '거래(예정)시간:${_convertUnixTime(itemData[index].receipt.tradeAt)}',
+                              style: TextStyle(
+                                  color: Colors.grey[700],
+                                  fontSize: 15,
+                                  letterSpacing: 0.3,
+                                  height: 1.3),
+                            ),
+                          ],
+                        ),
+                      ),
+                      headerBuilder: (BuildContext context, bool isExpanded) {
+                        return Container(
+                          padding: EdgeInsets.all(10),
+                          child: Text(
+                            itemData[index].receipt.productName,
                             style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold
+                              color: Colors.grey
+                              ,
+                              fontSize: 18,
                             ),
                           ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.only(bottom: 4),
-                          child:_usernameText(item['seller'])
-                        ),
-                        Container(
-                          padding: EdgeInsets.only(bottom: 4),
-                          child: AutoSizeText("구매일시:${_convertUnixTime(item["createAt"])}")
-                        ),
-                        Container(
-                            padding: EdgeInsets.only(bottom: 4),
-                            child: AutoSizeText("거래일시:${_convertUnixTime(item["tradeAt"])}")
-                        )
-                      ],
-                    ),
-                    _setChangeButton(item["tradeAt"]),
-                    ],
-                  ),
-                ),
+                        );
+                      },
+                      isExpanded: true,
+                    )
+                  ],
+                  expansionCallback: (int item, bool status) {
+                    print("chandge2 : ${itemData[index].isExpanded}");
+                    setState(() {
+                      itemData[index].isExpanded = !itemData[index].isExpanded;
+                      print("chandge3 : ${itemData[index].isExpanded}");
+
+                    },
+                    );
+                  },
                 );
-              });
+              },
+            );
+          }
         }
     );
   }
 }
-///내일 만들곳(06/11)
-class BuyListDetailWidget extends StatefulWidget {
-  const BuyListDetailWidget({Key key}) : super(key: key);
+/// TODO 거래완료 상태에따라, hash 표현되도록 하기
+/// TODO 거래진행 페이지 만들고, 거래를 통해 나온 결과 업데이트 하기
+class ReceiptNode {
+  Receipt receipt;
+  bool isExpanded;
 
-  @override
-  _BuyListDetailWidgetState createState() => _BuyListDetailWidgetState();
+  ReceiptNode({this.receipt, this.isExpanded: false});
 }
 
-class _BuyListDetailWidgetState extends State<BuyListDetailWidget> {
-  @override
-  Widget build(BuildContext context) {
-    return Container();
+List<ReceiptNode>generateItems(items){
+  return List.generate(items.length, (index) {
+    return ReceiptNode(
+       receipt: Receipt.fromJson(items[index].data())
+    );
   }
+  );
 }

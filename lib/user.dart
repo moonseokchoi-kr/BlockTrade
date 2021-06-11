@@ -61,7 +61,6 @@ void createUser(currentUser) async {
     if(querySnapshot.docs.isEmpty){
       account = await createAccount(),
       tct = await createTCT(account.address, 100),
-        print('Start CreateUser'),
         addUser(TradeUser(id: currentUser.uid,
                 username: currentUser.displayName,
                 email: currentUser.email,
@@ -80,7 +79,6 @@ void createUser(currentUser) async {
 Future<String> getUser(String id) async{
   var data = await collection.where('id', isEqualTo: id).snapshots().first;
   var author = data.docs.elementAt(0).data();
-  print(author['username']);
   return author['username'];
 }
 
