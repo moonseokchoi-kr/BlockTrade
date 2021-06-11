@@ -117,7 +117,7 @@ class _PayWidgetState extends State<PayWidget> {
               ),
               Container(
                 padding: EdgeInsets.only(bottom: 8),
-                child: AutoSizeText("금액 자동지불일시:${dateFormatter.format(tradeAt)} ${timeFormatter.format(tradeAt)}"
+                child: AutoSizeText("(자동)거래 일시:${dateFormatter.format(tradeAt)} ${timeFormatter.format(tradeAt)}"
                   , style: TextStyle(
                     fontSize: 20,
                     color: Colors.black87,
