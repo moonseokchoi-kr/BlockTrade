@@ -176,7 +176,7 @@ class _PayWidgetState extends State<PayWidget> {
                                             _payKlay(value,widget.address).then((value){
                                               Loader.hide();
                                               final snackBar = SnackBar(
-                                                  content: Text("거래가 예약되었습니다."),
+                                                  content: Text("거래가 완료되었습니다."),
                                                   action: SnackBarAction(
                                                     label: 'Undo',
                                                     onPressed: () {},

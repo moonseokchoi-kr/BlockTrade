@@ -113,7 +113,6 @@ class _BuyListWidgetState extends State<BuyListWidget> {
                     )
                 );
                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                Navigator.of(context).popUntil((route) => route.isFirst);
               },
             ),
           )
