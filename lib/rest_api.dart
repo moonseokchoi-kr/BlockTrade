@@ -20,11 +20,11 @@ final chainId= '1001';
 /// 입력 보낼 계정, 받는 계정, 클레이의 양, 영수증의 데이터
 /// https://refs.klaytnapi.com/ko/wallet/latest#operation/ValueTransferTransaction
 
-Future<TransferResult> transferKlay(String to, String from, num value, Receipt recipient) async{
+Future<String> transferKlay(String to, String from, num value, Receipt recipient) async{
   final request = jsonEncode({"from": from,
     "to": to,
-    "value": calKLayAmount(value),
-    "memo":jsonEncode({'id':0,'productName': "test", 'seller': "이미나", 'buyer': "최시온", 'trustToken': "3", 'createdAt': 1494832499, 'tradeTime': 1492832894, 'trade': false}),
+    "value": '0x${calKLayAmount(value)}',
+    "memo":jsonEncode(recipient.toMap()),
     "submit": true});
   final response = await http.post(Uri.parse('https://wallet-api.klaytnapi.com/v2/tx/value'),
     headers: {HttpHeaders.authorizationHeader: auth,
@@ -34,11 +34,14 @@ Future<TransferResult> transferKlay(String to, String from, num value, Receipt r
     body: request,
   );
   if(response.statusCode == 200){
-    return TransferResult.fromJson(jsonDecode(response.body));
+    TransferResult tr = TransferResult.fromJson(jsonDecode(response.body));
+    print("klay_transaction: ${tr.transaction}");
+    return tr.transaction;
   } else {
     // If the server did not return a 200 OK response,
     // then throw an exception.
-    throw Exception('Failed to transfer klay');
+    print(response.body);
+    return "";
   }
 }
 ///TCT토큰 잔액 조회
@@ -94,6 +97,7 @@ Future<String> getBalance(String account) async{
     // If the server did return a 200 OK response,
     // then parse the JSON.
     final json = jsonDecode(response.body);
+    print(json['result']);
     return calKLAYValue(json['result']);
   }else {
     print(response.body);
@@ -133,11 +137,10 @@ Future<TCT> createTCT(String to, num value) async{
 입력 받을계정 토큰의 양
 https://refs.klaytnapi.com/ko/kip7/latest#operation/TransferToken
  */
-Future<TCT> transferTCT(String from, String to, num value) async{
+Future<String> transferTCT(String to, num value) async{
   final contractAddress = 'trustcoin';
   final amount = calKLayAmount(value);
   final request = jsonEncode({
-    "from": from,
     "to":to,
     "amount":"0x$amount"});
   final response = await http.post(Uri.parse('https://kip7-api.klaytnapi.com/v1/contract/$contractAddress/transfer')
@@ -149,10 +152,11 @@ Future<TCT> transferTCT(String from, String to, num value) async{
       body: request
   );
   if(response.statusCode == 200){
-    return TCT.fromJson(jsonDecode(response.body));
+    TCT tct = TCT.fromJson(jsonDecode(response.body));
+    return tct.transaction;
   }else{
     print(response.body);
-    throw Exception("Faild to createTCT");
+    return "";
   }
 }
 
@@ -164,9 +168,9 @@ https://refs.klaytnapi.com/ko/kip17/latest#operation/ListContractsInDeployerPool
 //영수증 블록체인에 등록
 
 
-Future<TCT> mintNFT() async{
+Future<String> mintNFT() async{
   final contract = 'blockreceipt';
-  int id = await getNFTSize();
+  int id = await _getNFTSize();
   final request = jsonEncode({
     "to" : "0xA0E20bf364865540da3A655c4412Ab75980480F6",
     "id" : "0x${id.toRadixString(16)}",
@@ -181,7 +185,8 @@ Future<TCT> mintNFT() async{
     body: request,
   );
   if(response.statusCode == 200){
-    return TCT.fromJson(jsonDecode(response.body));
+    TCT tct=  TCT.fromJson(jsonDecode(response.body));
+    return tct.transaction;
   }else{
     print(response.body);
     throw Exception("Failed to mintNFT");
@@ -189,7 +194,7 @@ Future<TCT> mintNFT() async{
 }
 
 /// 1. NFT id자동생성(NFT목록을 조회해서 길이를 계산하여 id생성)
-Future<int> getNFTSize() async{
+Future<int> _getNFTSize() async{
   final response = await http.get(Uri.parse("https://kip17-api.klaytnapi.com/v1/contract/blockreceipt/token"),
       headers: {
         HttpHeaders.authorizationHeader: auth,

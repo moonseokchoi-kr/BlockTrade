@@ -40,6 +40,7 @@ dependencies:
   uuid: ^3.0.4
   flutter_layouts: ^0.0.2+1
   intl: ^0.17.0
+  flutter_overlay_loader: ^0.1.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

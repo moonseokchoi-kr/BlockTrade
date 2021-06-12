@@ -18,7 +18,8 @@ class ProductsTab extends StatefulWidget {
   static const androidIcon = Icon(Icons.shopping_bag_outlined);
   static const iosIcon = Icon(CupertinoIcons.music_note);
   final String author;
-  const ProductsTab({this.androidDrawer,this.author}) : super();
+  final String address;
+  const ProductsTab({this.androidDrawer,this.author,this.address}) : super();
 
   final Widget androidDrawer;
 
@@ -81,6 +82,7 @@ class _ProductsTabState extends State<ProductsTab> {
                               content: item['content'],
                               time: item['time_stamp'],
                               userName: item['author'],
+                              address : widget.address,
                             ),
                           ),
                         ),

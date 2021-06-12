@@ -1,4 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:block_trade/pay_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -6,8 +7,9 @@ import 'package:intl/intl.dart';
 import 'klay.dart';
 import 'user.dart';
 class BuyListWidget extends StatefulWidget {
-  const BuyListWidget({Key key, @required this.user}) : super(key: key);
+  const BuyListWidget({Key key, @required this.user, @required this.address}) : super(key: key);
   final user;
+  final address;
   @override
   _BuyListWidgetState createState() => _BuyListWidgetState();
 }
@@ -56,32 +58,66 @@ class _BuyListWidgetState extends State<BuyListWidget> {
       }
     );
   }
-  Widget _setChangeButton(int time){
+  Widget _setChangeButton(int time, bool trade, Receipt receipt, String address, String createAt){
     var now = DateTime.now().toUtc().millisecondsSinceEpoch;
-    if(now<time){
-      return Container(
-      decoration: BoxDecoration(
-            color: Colors.lightGreenAccent,
-            borderRadius: BorderRadius.all(
-                Radius.circular(30)
+    if(now<time && !trade){
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.green[400],
+                  borderRadius: BorderRadius.all(
+                      Radius.circular(30)
+                  ),
+                ),
+                child: TextButton(
+                child:AutoSizeText(
+                  "거래하기",
+                  style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              onPressed: (){
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>PayWidget(receipt: receipt,address: address, trade: true, createAt: createAt,)));
+              },
             ),
-            boxShadow: [
-              BoxShadow(color: Colors.grey[500], offset: Offset(1.0, 1.0), blurRadius: 15.0, spreadRadius: 1.0,),
-              BoxShadow( color: Colors.white, offset: Offset(-4.0, -4.0), blurRadius: 15.0, spreadRadius: 1.0, )
-            ]
           ),
-        child: TextButton(
-          child:AutoSizeText(
-          "거래하기",
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-
-        ),
-          onPressed: (){},
-        ),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.red[400],
+              borderRadius: BorderRadius.all(
+                  Radius.circular(30)
+              ),
+            ),
+            child: TextButton(
+              child:AutoSizeText(
+                "취소",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              onPressed: (){
+                FirebaseFirestore.instance.collection('receipt').doc(receipt.id).delete();
+                final snackBar = SnackBar(
+                    content: Text("예약이 취소되었습니다."),
+                    action: SnackBarAction(
+                      label: 'Undo',
+                      onPressed: () {},
+                    )
+                );
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+            ),
+          )
+        ],
       );
     }else{
       return Container(
@@ -91,7 +127,6 @@ class _BuyListWidgetState extends State<BuyListWidget> {
               Radius.circular(30)
           ),
         ),
-        child: TextButton(
           child:AutoSizeText(
             "거래완료",
             style: TextStyle(
@@ -101,8 +136,6 @@ class _BuyListWidgetState extends State<BuyListWidget> {
             ),
 
           ),
-          onPressed: (){},
-        ),
       );
     }
   }
@@ -112,6 +145,7 @@ class _BuyListWidgetState extends State<BuyListWidget> {
     var timeFormatter = DateFormat.Hms();
     return '${dayFormatter.format(unixTime)} ${timeFormatter.format(unixTime)}';
   }
+
   Widget _buildExpansionPanelList(){
     return StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('receipt').where('buyer', isEqualTo: widget.user ).snapshots(),
@@ -137,7 +171,7 @@ class _BuyListWidgetState extends State<BuyListWidget> {
                         padding: EdgeInsets.all(10),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             AutoSizeText(
                               '금액:${itemData[index].receipt.klay} KLAY',
@@ -148,6 +182,9 @@ class _BuyListWidgetState extends State<BuyListWidget> {
                                   height: 1.3),
                             ),
                             _usernameText(itemData[index].receipt.seller),
+                            SizedBox(
+                              height: 5,
+                            ),
                             AutoSizeText(
                               '구매시간:${_convertUnixTime(itemData[index].receipt.createdAt)} ',
                               style: TextStyle(
@@ -156,6 +193,7 @@ class _BuyListWidgetState extends State<BuyListWidget> {
                                   letterSpacing: 0.3,
                                   height: 1.3),
                             ),
+
                             AutoSizeText(
                               '거래(예정)시간:${_convertUnixTime(itemData[index].receipt.tradeAt)}',
                               style: TextStyle(
@@ -164,6 +202,34 @@ class _BuyListWidgetState extends State<BuyListWidget> {
                                   letterSpacing: 0.3,
                                   height: 1.3),
                             ),
+
+                            Visibility(
+                                child: AutoSizeText(
+                                  '클레이 전송 해시:${itemData[index].receipt.klayTransferHash}',
+                                  style: TextStyle(
+                                      color: Colors.grey[700],
+                                      fontSize: 15,
+                                      letterSpacing: 0.3,
+                                      height: 1.3),
+                                  ),
+                              visible: itemData[index].receipt.trade,
+                                ),
+                            Visibility(
+                              child: AutoSizeText(
+                                'NFT 토큰 해시:${itemData[index].receipt.nftHash}',
+                                style: TextStyle(
+                                    color: Colors.grey[700],
+                                    fontSize: 15,
+                                    letterSpacing: 0.3,
+                                    height: 1.3),
+                              ),
+                              visible: itemData[index].receipt.trade,
+                            ),
+                            SizedBox(
+                              height: 30,
+                            ),
+                            _setChangeButton(itemData[index].receipt.tradeAt, itemData[index].receipt.trade, itemData[index].receipt, widget.address, _convertUnixTime(itemData[index].receipt.createdAt)),
+
                           ],
                         ),
                       ),
@@ -184,12 +250,9 @@ class _BuyListWidgetState extends State<BuyListWidget> {
                     )
                   ],
                   expansionCallback: (int item, bool status) {
-                    print("chandge2 : ${itemData[index].isExpanded}");
                     setState(() {
                       itemData[index].isExpanded = !itemData[index].isExpanded;
-                      print("chandge3 : ${itemData[index].isExpanded}");
-
-                    },
+                      },
                     );
                   },
                 );

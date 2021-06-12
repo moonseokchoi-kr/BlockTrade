@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 ///kas 서비스와 관련된 클래스를정의하는곳
 
@@ -79,7 +78,7 @@ class Receipt{
         tradeAt: json['tradeAt'],
         klay: json['klay'],
         nftHash: json['nft_hash'],
-        klayTransferHash: json['klay_transfer_token'],
+        klayTransferHash: json['klay_transfer_hash'],
         trade: json['trade?']
     );
   }
@@ -91,16 +90,16 @@ class Receipt{
       'seller': seller ,
       'trust_token':trustToken,
       'nft_hash':nftHash,
-      'klay_tranfer_hash':klayTransferHash,
+      'klay_transfer_hash':klayTransferHash,
       'klay':klay,
       'createAt':createdAt,
       'tradeAt':tradeAt,
       'trade?':trade
     };
   }
-  void updateHash(String transferHash, String nftHash, int tradeAt){
+  void updateHash( transferHash,  nftHash, int tradeAt){
     this.nftHash = nftHash;
-    this.klayTransferHash = klayTransferHash;
+    this.klayTransferHash = transferHash;
     this.trade = true;
     this.tradeAt = tradeAt;
   }

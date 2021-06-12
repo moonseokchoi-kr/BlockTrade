@@ -17,7 +17,9 @@ class BlockTradeApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.deepOrange,
       ),
-      home: LoginHomePage(),
+      routes: {
+        "/" : (context) => LoginHomePage(),
+      },
     );
   }
 }
@@ -69,10 +71,10 @@ class _UsedTradingHomePageState extends State<UsedTradingHomePage> {
                     return CircularProgressIndicator();
                   }else{
                     final items = snapshot.data.docs;
-                    print("wallet_address: ${items[0]["wallet_address"]}");
                     return ProductsTab(
                       androidDrawer: _AndroidDrawer(currentUser: FirebaseAuth.instance.currentUser, address: items[0]["wallet_address"],),
                       author: FirebaseAuth.instance.currentUser.uid,
+                      address: items[0]["wallet_address"],
                     );
                   }
                 });
@@ -201,7 +203,7 @@ class _AndroidDrawerState extends State<_AndroidDrawer> {
             leading: Icon(Icons.shopping_bag),
             title: Text("구매내역"),
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context)=> BuyListWidget(user: FirebaseAuth.instance.currentUser.uid,)));
+              Navigator.push(context, MaterialPageRoute(builder: (context)=> BuyListWidget(user: FirebaseAuth.instance.currentUser.uid, address: widget.address,)));
             },
           ),
           ListTile(

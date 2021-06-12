@@ -5,7 +5,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:block_trade/pay_widget.dart';
 import 'package:block_trade/user.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_layouts/flutter_layouts.dart';
@@ -24,6 +23,7 @@ class ProductDetailTab extends StatefulWidget {
     @required this.price,
     @required this.userName,
     @required this.content,
+    @required this.address,
     @required this.time}) : super(key: key);
 
   final id;
@@ -33,6 +33,7 @@ class ProductDetailTab extends StatefulWidget {
   final userName;
   final content;
   final time;
+  final address;
   @override
   _ProductDetailTabState createState() => _ProductDetailTabState();
 }
@@ -61,16 +62,20 @@ class _ProductDetailTabState extends State<ProductDetailTab> {
   Widget _usernameText(){
     return StreamBuilder(
       stream: collection.where('id', isEqualTo: widget.userName).snapshots(),
-      builder: (context, snapShots){
-        final items = snapShots.data.docs;
-        return AutoSizeText(
-          items[0]['username'],
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        );
-      },
+      builder: (context, snapShots) {
+        if (snapShots.data == null) {
+          return CircularProgressIndicator();
+        } else {
+          final items = snapShots.data.docs;
+          return AutoSizeText(
+            items[0]['username'],
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          );
+        }
+      }
     );
   }
   Widget _buildBody(BuildContext ctx) {
@@ -220,7 +225,7 @@ class _ProductDetailTabState extends State<ProductDetailTab> {
                   ),
                 ),
                 child: TextButton(
-                    onPressed: () { Navigator.push(context, MaterialPageRoute(builder: (context)=> PayWidget(klay:widget.price,productName: widget.title,seller: widget.userName,)));},
+                    onPressed: () { Navigator.push(context, MaterialPageRoute(builder: (context)=> PayWidget(klay:widget.price,productName: widget.title,seller: widget.userName, address: widget.address)));},
                     child:AutoSizeText('거래하기'
                     ,style: TextStyle(
                         color: Colors.white,
