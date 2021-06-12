@@ -4,7 +4,7 @@ import 'klay.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-final auth = 'Basic S0FTS0NLRDJRTzE1RE4yRVBGR1JIVEhPOjdvZmFGMnlQYmR4VkFKMjAwRU53OStGQ1ZoV01MeUJrc2twSGxGN28=';
+final auth = '';
 final chainId= '1001';
 
 /// 추가적으로 만들것들
