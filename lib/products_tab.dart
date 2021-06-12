@@ -3,15 +3,12 @@
 // found in the LICENSE file.
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
 import 'product_detial_tab.dart';
-import 'utils.dart';
 import 'widgets.dart';
-import 'user.dart';
+
 
 class ProductsTab extends StatefulWidget {
   static const title = 'Products';
@@ -28,11 +25,7 @@ class ProductsTab extends StatefulWidget {
 }
 
 class _ProductsTabState extends State<ProductsTab> {
-  static const _itemsLength = 50;
   final _androidRefreshKey = GlobalKey<RefreshIndicatorState>();
-
-  List<MaterialColor> colors;
-  List<String> songNames;
 
   @override
   void initState() {

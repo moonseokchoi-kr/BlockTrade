@@ -4,7 +4,7 @@ import 'klay.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-final auth = '';
+final auth = '자신의 authtoken을 채워넣으세요';
 final chainId= '1001';
 
 /// 추가적으로 만들것들
