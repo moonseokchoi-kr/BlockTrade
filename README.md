@@ -4,6 +4,19 @@ Klaytn기반 비대면 중고거래 앱입니다.
 ---
 ### 실행방법
 + rest_api.dart auth변수안에 KAS API KEY를 넣어야 정상적으로 실행할 수 있습니다.('Basic~'으로 시작합니다)
++ 이 프로젝트는 FireBase Store, Storage, Auth기능을 이용합니다. 이 프로젝트를 제대로 실행하기 위해서는 FireBase연동이 필요합니다. 아래 링크에 나온 방법을 따라하세요
+++ [Android Application Firebase 연동](https://firebase.google.com/docs/android/setup?hl=ko)
+
++ FirebaseStore에 다음과 같이 Collection을 생성합니다
+
+
+![FireStore Collection](https://user-images.githubusercontent.com/62063600/121792995-0c348180-cc36-11eb-98ac-29d093744318.png)
+
++ FirebaseStorage에 posts폴더를 생성합니다.
+
++ FirebaseAuth는 구글로그인을 설정합니다.
+
+![GoogleLogin](https://user-images.githubusercontent.com/62063600/121793078-9e3c8a00-cc36-11eb-97f5-c99778948831.png)
 ---
 ### 앱화면
 
