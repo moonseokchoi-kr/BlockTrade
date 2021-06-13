@@ -12,16 +12,28 @@ Klaytn기반 비대면 중고거래 앱입니다.
 
 #### 앱화면 구성
 + 거래 내용페이지
+
+
   ![거래내용 페이지](https://user-images.githubusercontent.com/62063600/121780378-f0e85880-cbda-11eb-8622-4ff97e22077e.jpg)
 + 구매내역 페이지
+
+
   ![구매내역 페이지](https://user-images.githubusercontent.com/62063600/121780380-f2b21c00-cbda-11eb-8c74-adc114084385.jpg)
 + 드로어 페이지
+
+
   ![드로어 페이지](https://user-images.githubusercontent.com/62063600/121780383-f5147600-cbda-11eb-82ab-4bf0586acf1e.jpg)
 + 메인페이지
+
+
   ![메인페이지](https://user-images.githubusercontent.com/62063600/121780384-f645a300-cbda-11eb-881d-f2b4319b7f57.jpg)
 + 제품상세내용 페이지
+
+
   ![제품상세내용 페이지](https://user-images.githubusercontent.com/62063600/121780385-f80f6680-cbda-11eb-976e-0051d0650015.jpg)
 + 포스트작성 페이지
+
+
   ![포스트작성 페이지](https://user-images.githubusercontent.com/62063600/121780386-fa71c080-cbda-11eb-820e-c679748d2ac1.jpg)
 
 ---
